@@ -67,7 +67,7 @@ function Footer() {
               <li>Privacy Policy</li>
             </ul>
           </Col>
-
+                    
           <Col md={2}>
             <h6 className="fw-bold">FAQ</h6>
             <ul className="list-unstyled small">

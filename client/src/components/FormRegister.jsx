@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Eye, EyeOff } from "lucide-react";
+import Swal from "sweetalert2";
 
 function FormRegister() {
   const [form, setForm] = useState({
     email: "",
-    phone: "",
     name: "",
     password: "",
     confirmPassword: "",
@@ -14,12 +14,12 @@ function FormRegister() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [isFilled, setIsFilled] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const { email, phone, name, password, confirmPassword } = form;
+    const { email, name, password, confirmPassword } = form;
     setIsFilled(
       email.trim() &&
-        phone.trim() &&
         name.trim() &&
         password.trim() &&
         confirmPassword.trim()
@@ -34,6 +34,58 @@ function FormRegister() {
   const handleBlur = (e) => {
     const { name } = e.target;
     setTouched((prev) => ({ ...prev, [name]: true }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (form.password !== form.confirmPassword) {
+      Swal.fire({
+        icon: "error",
+        title: "Password tidak cocok",
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await fetch("http://localhost:8000/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: form.email,
+          username: form.name,
+          password: form.password,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        Swal.fire({
+          icon: "success",
+          title: "Registrasi berhasil",
+          text: "Silakan login untuk melanjutkan",
+          timer: 1500,
+          showConfirmButton: false,
+        }).then(() => {
+          window.location.href = "/login";
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Registrasi gagal",
+          text: data.message || "Terjadi kesalahan",
+        });
+      }
+    } catch (err) {
+      Swal.fire({
+        icon: "error",
+        title: "Kesalahan server",
+        text: err.message,
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const renderInput = (name, placeholder, isPassword = false, showToggle = false) => {
@@ -82,15 +134,20 @@ function FormRegister() {
         Tambahin produk ke keranjang, bisa checkout kapan aja!
       </p>
 
-      {renderInput("email", "Masukan email")}
-      {renderInput("phone", "Masukan nomor hp.")}
-      {renderInput("name", "Masukan nama")}
-      {renderInput("password", "Masukan password", true, true)}
-      {renderInput("confirmPassword", "Masukan konfirmasi password", true, true)}
+      <form onSubmit={handleSubmit}>
+        {renderInput("email", "Masukan email")}
+        {renderInput("name", "Masukan nama")}
+        {renderInput("password", "Masukan password", true, true)}
+        {renderInput("confirmPassword", "Masukan konfirmasi password", true, true)}
 
-      <button className="btn btn-secondary w-100 mt-3" disabled={!isFilled}>
-        Daftar
-      </button>
+        <button
+          className="btn btn-secondary w-100 mt-3"
+          disabled={!isFilled || loading}
+          type="submit"
+        >
+          {loading ? "Memproses..." : "Daftar"}
+        </button>
+      </form>
 
       <p className="text-center mt-3">
         Have an Account?? <a href="/login">Login</a>

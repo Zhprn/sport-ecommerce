@@ -112,9 +112,7 @@ function CategoryProducts() {
           <button
             key={cat}
             className={`btn me-2 rounded-pill px-3 ${
-              selectedCategory === cat
-                ? "btn-dark"
-                : "btn-outline-dark"
+              selectedCategory === cat ? "btn-dark" : "btn-outline-dark"
             }`}
             onClick={() => setSelectedCategory(cat)}
           >
@@ -123,45 +121,45 @@ function CategoryProducts() {
         ))}
       </div>
 
-<div className="row g-4">
-  {filteredProducts.length === 0 ? (
-    <div className="col-12 text-center py-5">
-      <h5 className="text-muted">Product Not Found</h5>
-    </div>
-  ) : (
-    (showAll ? filteredProducts : filteredProducts.slice(0, 4)).map(
-      (product) => (
-        <div key={product.id} className="col-12 col-sm-6 col-md-3">
-          <div className="text-center p-3 bg-light rounded shadow-sm h-100">
-            <img
-              src={product.image}
-              alt={product.name}
-              className="img-fluid mb-3"
-              style={{ maxHeight: 200, objectFit: "contain" }}
-            />
-            <p className="fw-semibold mb-1">{product.name}</p>
-            <div className="d-flex justify-content-center align-items-center gap-1 small text-warning">
-              {renderStars(product.rating)}
-            </div>
-            <div className="mt-2">
-              <strong>${product.price}</strong>
-              {product.originalPrice && (
-                <>
-                  <span className="text-muted text-decoration-line-through ms-2">
-                    ${product.originalPrice}
-                  </span>
-                  <span className="badge bg-light text-danger border ms-2">
-                    -{product.discount}%
-                  </span>
-                </>
-              )}
-            </div>
+      <div className="row g-4">
+        {filteredProducts.length === 0 ? (
+          <div className="col-12 text-center py-5">
+            <h5 className="text-muted">Product Not Found</h5>
           </div>
-        </div>
-      )
-    )
-  )}
-</div>
+        ) : (
+          (showAll ? filteredProducts : filteredProducts.slice(0, 4)).map(
+            (product) => (
+              <div key={product.id} className="col-12 col-sm-6 col-md-3">
+                <div className="text-center p-3 bg-light rounded shadow-sm h-100">
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="img-fluid mb-3"
+                    style={{ maxHeight: 200, objectFit: "contain" }}
+                  />
+                  <p className="fw-semibold mb-1">{product.name}</p>
+                  <div className="d-flex justify-content-center align-items-center gap-1 small text-warning">
+                    {renderStars(product.rating)}
+                  </div>
+                  <div className="mt-2">
+                    <strong>${product.price}</strong>
+                    {product.originalPrice && (
+                      <>
+                        <span className="text-muted text-decoration-line-through ms-2">
+                          ${product.originalPrice}
+                        </span>
+                        <span className="badge bg-light text-danger border ms-2">
+                          -{product.discount}%
+                        </span>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )
+          )
+        )}
+      </div>
 
       <div className="text-center mt-4">
         {filteredProducts.length > 4 && (
