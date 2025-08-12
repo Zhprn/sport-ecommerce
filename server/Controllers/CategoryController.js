@@ -1,7 +1,6 @@
 const { Category } = require('../models');
 
 module.exports = {
-  // Create Category
   create: async (req, res) => {
     try {
       const { name_category } = req.body;
@@ -21,7 +20,6 @@ module.exports = {
     }
   },
 
-  // Get All Categories
   getAll: async (req, res) => {
     try {
       const categories = await Category.findAll();
@@ -33,8 +31,6 @@ module.exports = {
       res.status(500).json({ message: error.message });
     }
   },
-
-  // Get Category by ID
   getById: async (req, res) => {
     try {
       const { id } = req.params;
@@ -52,8 +48,6 @@ module.exports = {
       res.status(500).json({ message: error.message });
     }
   },
-
-  // Update Category
   update: async (req, res) => {
     try {
       const { id } = req.params;
@@ -75,8 +69,6 @@ module.exports = {
       res.status(500).json({ message: error.message });
     }
   },
-
-  // Delete Category
   delete: async (req, res) => {
     try {
       const { id } = req.params;

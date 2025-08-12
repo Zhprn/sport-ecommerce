@@ -22,6 +22,7 @@ db.Category = require('./categories')(sequelize, DataTypes);
 db.Product = require('./products')(sequelize, DataTypes);
 db.Payment = require('./payments')(sequelize, DataTypes);
 db.Order = require('./orders')(sequelize, DataTypes);
+db.Cart = require('./cart.js')(sequelize, DataTypes);
 
 Object.keys(db).forEach((modelName) => {
   if (db[modelName].associate) {
