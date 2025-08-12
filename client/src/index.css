@@ -19,3 +19,24 @@ li {
 li a {
   text-decoration: none;
 }
+
+.sidebar {
+  width: 250px;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+.sidebar .nav-link {
+  color: #6c757d;
+  padding: 10px 20px;
+  font-size: 0.95rem;
+}
+
+.sidebar .nav-link:hover,
+.sidebar .nav-link.active {
+  background-color: #f0f2f5;
+  color: #5e72e4;
+  border-radius: 8px;
+}
