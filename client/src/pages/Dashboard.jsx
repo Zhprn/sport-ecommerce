@@ -3,6 +3,7 @@ import Sidebar from "../components/Sidebar";
 import ManageProduct from "../components/ManageProduct";
 import ManageCategory from "../components/ManageCategory";
 import AddProduct from "../components/AddProduct";
+import AddCategory from "../components/AddCategory";
 
 export default function Dashboard() {
   const [activePage, setActivePage] = useState("dashboard");
@@ -13,10 +14,8 @@ export default function Dashboard() {
         return <ManageProduct />;
       case "category":
         return <ManageCategory />;
-      case "addProduct":
+        case "addProduct":
         return <AddProduct />
-      case "addCategory":
-        return <AddCategory />;
       default:
         return <h2>Selamat datang di Dashboard</h2>;
     }
@@ -24,7 +23,7 @@ export default function Dashboard() {
 
   return (
     <div style={{ display: "flex", minHeight: "100vh" }}>
-      <div style={{ width: "250px", background: "#fff", borderRight: "1px solid #ddd" }}>
+      <div style={{ width: "250px", background: "#fff", borderRight: "1px solid #ddd"}}>
         <Sidebar setActivePage={setActivePage} />
       </div>
       <div style={{ flex: 1, padding: "20px" }}>

@@ -33,12 +33,11 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({ storage, fileFilter }).single("image");
 
 module.exports = {
-  // CREATE Product
   create: (req, res) => {
     upload(req, res, async (err) => {
       if (err) return res.status(400).json({ message: err.message });
       try {
-        const { nama_product, harga_produk, rating_produk, id_category } = req.body;
+        const { nama_product, harga_produk, rating_produk, id_category, description } = req.body;
         if (!req.file) return res.status(400).json({ message: "Image is required" });
 
         const newProduct = await Product.create({
@@ -46,6 +45,7 @@ module.exports = {
           harga_produk,
           rating_produk,
           id_category,
+          description,
           image: req.file.filename
         });
 
@@ -56,19 +56,31 @@ module.exports = {
     });
   },
 
-  // READ all products
-  getAll: async (req, res) => {
-    try {
-      const products = await Product.findAll({
-        include: [{ model: Category, attributes: ["id_category", "name_category"] }]
-      });
-      res.json(products);
-    } catch (err) {
-      res.status(500).json({ message: err.message });
-    }
-  },
+getAll: async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 8;
+    const offset = (page - 1) * limit;
+    const totalCount = await Product.count();
+    const totalPages = Math.ceil(totalCount / limit);
+    const products = await Product.findAll({
+      include: [{ model: Category, attributes: ["id_category", "name_category"] }],
+      limit,
+      offset,
+      order: [['id_product', 'ASC']],
+    });
+    res.json({
+      currentPage: page,
+      totalPages,
+      totalCount,
+      data: products,
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+},
 
-  // READ one product
+
   getOne: async (req, res) => {
     try {
       const product = await Product.findByPk(req.params.id, {
@@ -81,12 +93,11 @@ module.exports = {
     }
   },
 
-  // UPDATE product
   update: (req, res) => {
     upload(req, res, async (err) => {
       if (err) return res.status(400).json({ message: err.message });
       try {
-        const { nama_product, harga_produk, rating_produk, id_category } = req.body;
+        const { nama_product, harga_produk, rating_produk, id_category, description } = req.body;
         const product = await Product.findByPk(req.params.id);
 
         if (!product) return res.status(404).json({ message: "Product not found" });
@@ -103,6 +114,7 @@ module.exports = {
           harga_produk,
           rating_produk,
           id_category,
+          description,
           image: updatedImage
         });
 
@@ -113,7 +125,6 @@ module.exports = {
     });
   },
 
-  // DELETE product
   delete: async (req, res) => {
     try {
       const product = await Product.findByPk(req.params.id);

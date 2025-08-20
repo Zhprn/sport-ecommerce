@@ -10,14 +10,23 @@ export default function ProductTable() {
   const [openDropdownId, setOpenDropdownId] = useState(null);
   const [editProduct, setEditProduct] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const limit = 8;
 
   const IMAGE_BASE_URL = "http://localhost:8000/uploads/products/";
 
   useEffect(() => {
     const fetchProducts = async () => {
+      setLoading(true);
       try {
-        const res = await axios.get("http://localhost:8000/api/product");
-        setProducts(res.data);
+        const res = await axios.get("http://localhost:8000/api/product", {
+          params: { page, limit },
+        });
+
+        // Sesuaikan dengan struktur JSON
+        setProducts(res.data.data || []);
+        setTotalPages(res.data.totalPages || res.data.total_pages || 1);
       } catch (error) {
         alert("Error fetching products: " + error.message);
       } finally {
@@ -25,7 +34,7 @@ export default function ProductTable() {
       }
     };
     fetchProducts();
-  }, []);
+  }, [page]);
 
   const renderStars = (rating) => {
     const fullStars = Math.floor(Number(rating));
@@ -63,6 +72,7 @@ export default function ProductTable() {
       category_name: product.Category?.name_category || "",
       image: null,
       currentImage: product.image || null,
+      description: product.description || "",
     });
     setImagePreview(null);
     setOpenDropdownId(null);
@@ -78,6 +88,7 @@ export default function ProductTable() {
         rating_produk,
         category_name,
         image,
+        description,
       } = editProduct;
 
       const formData = new FormData();
@@ -85,6 +96,7 @@ export default function ProductTable() {
       formData.append("harga_produk", harga_produk);
       formData.append("rating_produk", rating_produk);
       formData.append("category_name", category_name);
+      formData.append("description", description);
       if (image) {
         formData.append("image", image);
       }
@@ -103,6 +115,7 @@ export default function ProductTable() {
                 rating_produk,
                 Category: { name_category: category_name },
                 image: image ? imagePreview : p.image,
+                description,
               }
             : p
         )
@@ -112,7 +125,7 @@ export default function ProductTable() {
       setImagePreview(null);
       Swal.fire("Berhasil", "Produk berhasil diperbarui", "success");
     } catch (error) {
-      Swal.fire("Gagal", "Gagal memperbarui produk", error);
+      Swal.fire("Gagal", "Gagal memperbarui produk", error.message);
     }
   };
 
@@ -132,7 +145,7 @@ export default function ProductTable() {
           Swal.fire("Terhapus!", "Produk berhasil dihapus.", "success");
           setProducts((prev) => prev.filter((p) => p.id_product !== product.id_product));
         } catch (error) {
-          Swal.fire("Gagal!", "Gagal menghapus produk.", error);
+          Swal.fire("Gagal!", "Gagal menghapus produk.", error.message);
         }
       }
       setOpenDropdownId(null);
@@ -176,6 +189,7 @@ export default function ProductTable() {
               <th style={{ padding: "12px 15px", minWidth: 130 }}>CATEGORY</th>
               <th style={{ padding: "12px 15px", minWidth: 90 }}>PRICE</th>
               <th style={{ padding: "12px 15px", minWidth: 110 }}>RATING</th>
+              <th style={{ padding: "12px 15px", minWidth: 110 }}>DESCRIPTION</th>
               <th style={{ padding: "12px 15px", minWidth: 90, textAlign: "center" }}>
                 ACTIONS
               </th>
@@ -184,7 +198,7 @@ export default function ProductTable() {
           <tbody>
             {products.length === 0 && (
               <tr>
-                <td colSpan={5} style={{ padding: 20, textAlign: "center" }}>
+                <td colSpan={6} style={{ padding: 20, textAlign: "center" }}>
                   No products found.
                 </td>
               </tr>
@@ -234,6 +248,9 @@ export default function ProductTable() {
                 <td style={{ padding: "12px 15px" }}>{formatPrice(product.harga_produk)}</td>
                 <td style={{ padding: "12px 15px", color: "#f59e0b" }}>
                   {renderStars(product.rating_produk)}
+                </td>
+                <td style={{ padding: "12px 15px", color: "#6c757d", maxWidth: 200, whiteSpace: "normal" }}>
+                  {product.description || "-"}
                 </td>
                 <td style={{ padding: "12px 15px", textAlign: "center", position: "relative" }}>
                   <div style={{ position: "relative", display: "inline-block" }}>
@@ -311,6 +328,49 @@ export default function ProductTable() {
         </table>
       </div>
 
+      {/* Pagination */}
+      <div
+        style={{
+          marginTop: 16,
+          display: "flex",
+          justifyContent: "center",
+          gap: 12,
+          alignItems: "center",
+          fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+        }}
+      >
+        <button
+          onClick={() => setPage((p) => Math.max(p - 1, 1))}
+          disabled={page === 1 || loading}
+          style={{
+            padding: "8px 16px",
+            borderRadius: 6,
+            border: "1px solid #6c757d",
+            backgroundColor: page === 1 ? "#e9ecef" : "white",
+            cursor: page === 1 ? "not-allowed" : "pointer",
+          }}
+        >
+          Previous
+        </button>
+        <span>
+          Page {page} of {totalPages}
+        </span>
+        <button
+          onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
+          disabled={page === totalPages || loading}
+          style={{
+            padding: "8px 16px",
+            borderRadius: 6,
+            border: "1px solid #6c757d",
+            backgroundColor: page === totalPages ? "#e9ecef" : "white",
+            cursor: page === totalPages ? "not-allowed" : "pointer",
+          }}
+        >
+          Next
+        </button>
+      </div>
+
+      {/* Edit Modal */}
       {editProduct && (
         <div
           style={{
@@ -432,44 +492,47 @@ export default function ProductTable() {
             </label>
 
             <label style={{ fontWeight: "600", color: "#555" }}>
-              Ganti Gambar Produk:
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-                style={{ marginTop: 6 }}
+              Description:
+              <textarea
+                value={editProduct.description}
+                onChange={(e) =>
+                  setEditProduct((prev) => ({ ...prev, description: e.target.value }))
+                }
+                style={{
+                  width: "100%",
+                  padding: "10px 12px",
+                  marginTop: 6,
+                  borderRadius: 6,
+                  border: "1px solid #ccc",
+                  fontSize: 14,
+                  resize: "vertical",
+                  minHeight: 60,
+                }}
               />
             </label>
 
-            {(imagePreview || editProduct.currentImage) && (
-              <div
-                style={{
-                  marginTop: 6,
-                  display: "flex",
-                  justifyContent: "center",
-                }}
-              >
-                <img
-                  src={imagePreview || IMAGE_BASE_URL + editProduct.currentImage}
-                  alt="Preview"
-                  style={{
-                    maxHeight: 100,
-                    borderRadius: 8,
-                    objectFit: "contain",
-                    border: "1px solid #ddd",
-                  }}
-                />
-              </div>
+            <label style={{ fontWeight: "600", color: "#555" }}>
+              Ganti Gambar:
+              <input type="file" accept="image/*" onChange={handleImageChange} />
+            </label>
+
+            {imagePreview && (
+              <img
+                src={imagePreview}
+                alt="Preview"
+                style={{ maxWidth: "100%", borderRadius: 6, marginTop: 6 }}
+              />
             )}
 
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "flex-end",
-                gap: 12,
-                marginTop: 16,
-              }}
-            >
+            {!imagePreview && editProduct.currentImage && (
+              <img
+                src={IMAGE_BASE_URL + editProduct.currentImage}
+                alt="Current"
+                style={{ maxWidth: "100%", borderRadius: 6, marginTop: 6 }}
+              />
+            )}
+
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: 12, marginTop: 16 }}>
               <button
                 type="button"
                 onClick={() => {
@@ -478,12 +541,10 @@ export default function ProductTable() {
                 }}
                 style={{
                   padding: "8px 16px",
-                  backgroundColor: "#ccc",
-                  border: "none",
                   borderRadius: 6,
+                  border: "1px solid #6c757d",
+                  backgroundColor: "white",
                   cursor: "pointer",
-                  fontWeight: "600",
-                  color: "#333",
                 }}
               >
                 Cancel
@@ -492,12 +553,11 @@ export default function ProductTable() {
                 type="submit"
                 style={{
                   padding: "8px 16px",
+                  borderRadius: 6,
+                  border: "none",
                   backgroundColor: "#0d6efd",
                   color: "white",
-                  border: "none",
-                  borderRadius: 6,
                   cursor: "pointer",
-                  fontWeight: "600",
                 }}
               >
                 Save

@@ -20,14 +20,11 @@ const Sidebar = ({ setActivePage }) => {
         </li>
 
         <li className="nav-item mt-2 small text-muted px-3">MANAGE</li>
-
-        {/* Product */}
         <li className="nav-item">
           <button className="nav-link btn btn-link text-start w-100" onClick={() => setActivePage("product")}>
             <Settings size={18} className="me-2" /> Product
           </button>
         </li>
-        {/* Add Product */}
         <li className="nav-item ps-4">
           <button
             className="nav-link btn btn-link text-start w-100 text-success"
@@ -36,20 +33,9 @@ const Sidebar = ({ setActivePage }) => {
             <PlusCircle size={16} className="me-2" /> Add Product
           </button>
         </li>
-
-        {/* Category */}
         <li className="nav-item">
           <button className="nav-link btn btn-link text-start w-100" onClick={() => setActivePage("category")}>
             <Box size={18} className="me-2" /> Category
-          </button>
-        </li>
-        {/* Add Category */}
-        <li className="nav-item ps-4">
-          <button
-            className="nav-link btn btn-link text-start w-100 text-success"
-            onClick={() => setActivePage("addCategory")}
-          >
-            <PlusCircle size={16} className="me-2" /> Add Category
           </button>
         </li>
       </ul>

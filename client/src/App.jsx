@@ -9,6 +9,7 @@ import Accessories from './pages/Accessories';
 import Purchase from './pages/Purchase';
 import Brand from './pages/Brand';
 import Dashboard from './pages/Dashboard';
+import DetailProduct from './pages/DetailProduct';
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
         <Route path="/cart" element={<Purchase/>}/>
         <Route path="/brand" element={<Brand/>}/>
         <Route path="/dashboard" element={<Dashboard/>}/>
+        <Route path="/detailproduct/:id" element={<DetailProduct/>}/>
       </Routes>
     </Router>
   )

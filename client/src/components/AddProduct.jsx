@@ -10,6 +10,7 @@ export default function AddProduct() {
     harga_produk: "",
     rating_produk: "",
     id_category: "",
+    description: "",
     image: null,
   });
   const [submitting, setSubmitting] = useState(false);
@@ -58,6 +59,7 @@ export default function AddProduct() {
       data.append("harga_produk", form.harga_produk);
       data.append("rating_produk", form.rating_produk);
       data.append("id_category", form.id_category);
+      data.append("description", form.description);
       data.append("image", form.image);
 
       await axios.post("http://localhost:8000/api/product", data, {
@@ -77,6 +79,7 @@ export default function AddProduct() {
         harga_produk: "",
         rating_produk: "",
         id_category: "",
+        description: "",
         image: null,
       });
     } catch (error) {
@@ -98,8 +101,8 @@ export default function AddProduct() {
       style={{
         display: "flex",
         justifyContent: "center",
-        padding: 24,    
-        boxSizing: "border-box",    
+        padding: 24,
+        boxSizing: "border-box",
       }}
     >
       <div style={{ width: "100%", maxWidth: 600 }}>
@@ -144,7 +147,6 @@ export default function AddProduct() {
             boxSizing: "border-box",
           }}
         >
-          {/* Nama Produk */}
           <div style={{ marginBottom: 24 }}>
             <label
               htmlFor="nama_product"
@@ -180,7 +182,6 @@ export default function AddProduct() {
             />
           </div>
 
-          {/* Harga Produk */}
           <div style={{ marginBottom: 24 }}>
             <label
               htmlFor="harga_produk"
@@ -217,7 +218,6 @@ export default function AddProduct() {
             />
           </div>
 
-          {/* Rating Produk */}
           <div style={{ marginBottom: 24 }}>
             <label
               htmlFor="rating_produk"
@@ -256,7 +256,6 @@ export default function AddProduct() {
             />
           </div>
 
-          {/* Kategori */}
           <div style={{ marginBottom: 24 }}>
             <label
               htmlFor="id_category"
@@ -301,7 +300,41 @@ export default function AddProduct() {
             </select>
           </div>
 
-          {/* Gambar Produk */}
+          <div style={{ marginBottom: 24 }}>
+            <label
+              htmlFor="description"
+              style={{
+                display: "block",
+                marginBottom: 6,
+                fontWeight: 600,
+                color: "#333",
+              }}
+            >
+              Deskripsi Produk
+            </label>
+            <textarea
+              id="description"
+              name="description"
+              value={form.description}
+              onChange={handleInputChange}
+              disabled={submitting}
+              placeholder="Masukkan deskripsi produk"
+              rows={4}
+              style={{
+                width: "100%",
+                padding: "12px 14px",
+                fontSize: 16,
+                borderRadius: 8,
+                border: "1.5px solid #ccc",
+                outline: "none",
+                transition: "border-color 0.3s",
+                resize: "vertical",
+              }}
+              onFocus={(e) => (e.target.style.borderColor = "#2a56c6")}
+              onBlur={(e) => (e.target.style.borderColor = "#ccc")}
+            />
+          </div>
+
           <div style={{ marginBottom: 24 }}>
             <label
               htmlFor="image"
@@ -320,7 +353,7 @@ export default function AddProduct() {
               style={{
                 display: "inline-block",
                 padding: "10px 18px",
-                border : "1px solid black",
+                border: "1px solid black",
                 color: "black",
                 borderRadius: 8,
                 cursor: submitting ? "not-allowed" : "pointer",
