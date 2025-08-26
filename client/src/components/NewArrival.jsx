@@ -98,6 +98,7 @@ function NewArrivals() {
                 alt={product.nama_product}
                 className="img-fluid mb-3"
                 style={{ maxHeight: 200, objectFit: "contain" }}
+      
               />
               <p className="fw-semibold mb-1 flex-grow-1">{product.nama_product}</p>
               <div className="d-flex justify-content-center align-items-center gap-1 small text-warning mb-2">

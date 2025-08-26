@@ -80,6 +80,54 @@ getAll: async (req, res) => {
   }
 },
 
+getByCategoryId: async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 8;
+    const offset = (page - 1) * limit;
+    const categoryId = parseInt(req.params.id); // ambil dari params
+
+    if (!categoryId) {
+      return res.status(400).json({ message: "Category ID is required" });
+    }
+
+    // Hitung total produk di kategori ini
+    const totalCount = await Product.count({
+      where: { id_category: categoryId },
+    });
+
+    if (totalCount === 0) {
+      return res.status(404).json({ message: "Product not found in this category" });
+    }
+
+    const totalPages = Math.ceil(totalCount / limit);
+
+    // Ambil produk sesuai kategori
+    const products = await Product.findAll({
+      where: { id_category: categoryId },
+      include: [
+        {
+          model: Category,
+          attributes: ["id_category", "name_category"],
+        },
+      ],
+      limit,
+      offset,
+      order: [["id_product", "ASC"]],
+    });
+
+    res.json({
+      currentPage: page,
+      totalPages,
+      totalCount,
+      data: products,
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+},
+
+
 
   getOne: async (req, res) => {
     try {

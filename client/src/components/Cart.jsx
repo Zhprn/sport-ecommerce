@@ -3,91 +3,119 @@ import axios from "axios";
 import { ShoppingCart, Minus, Plus } from "lucide-react";
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
+import { useNavigate } from "react-router-dom";
 
 const CartPage = () => {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [address, setAddress] = useState("");
-  const [voucher, setVoucher] = useState("");
-  const [shippingMethod, setShippingMethod] = useState("Reguler");
   const [paymentMethod, setPaymentMethod] = useState("Transfer Bank");
   const [notes, setNotes] = useState("");
-
-  const ongkir = 10000;
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCart = async () => {
       try {
-        const id_user = localStorage.getItem("id_user");
-        if (!id_user) throw new Error("User belum login");
+        const user_id = localStorage.getItem("id_user");
+        if (!user_id) return navigate("/login");
 
-        const res = await axios.get("http://localhost:8000/api/cart", {
-          params: { id_user },
-        });
-
+        const res = await axios.get(`http://localhost:8000/api/cart/${user_id}`);
         setCartItems(res.data);
       } catch (error) {
-        alert("Gagal mengambil data keranjang: " + error.message);
+        Swal.fire("Error", "Gagal mengambil data keranjang: " + error.message, "error");
       } finally {
         setLoading(false);
       }
     };
 
     fetchCart();
-  }, []);
+  }, [navigate]);
 
-const handleQuantityChange = async (id_cart, delta) => {
-  try {
-    const item = cartItems.find((item) => item.id_cart === id_cart);
-    if (!item) return;
+  const handleQuantityChange = async (id_cart, delta) => {
+    try {
+      const item = cartItems.find((item) => item.id_cart === id_cart);
+      if (!item) return;
 
-    const newQty = item.quantity + delta;
+      const newQty = item.quantity + delta;
 
-    if (newQty < 1) {
-      const result = await Swal.fire({
-        title: "Hapus Produk?",
-        text: `Apakah Anda yakin ingin menghapus "${item.product.nama_product}" dari keranjang?`,
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Ya, hapus",
-        cancelButtonText: "Batal",
-        confirmButtonColor: "#d33",
-        cancelButtonColor: "#3085d6",
-      });
+      if (newQty < 1) {
+        const result = await Swal.fire({
+          title: "Hapus Produk?",
+          text: `Apakah Anda yakin ingin menghapus "${item.product.nama_product}" dari keranjang?`,
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: "Ya, hapus",
+          cancelButtonText: "Batal",
+          confirmButtonColor: "#d33",
+          cancelButtonColor: "#3085d6",
+        });
 
-      if (result.isConfirmed) {
-        await axios.post(`http://localhost:8000/api/cart/${id_cart}`);
-        setCartItems((prev) => prev.filter((i) => i.id_cart !== id_cart));
-        Swal.fire("Dihapus!", "Produk berhasil dihapus dari keranjang.", "success");
+        if (result.isConfirmed) {
+          await axios.post(`http://localhost:8000/api/cart/${id_cart}`);
+          setCartItems((prev) => prev.filter((i) => i.id_cart !== id_cart));
+          Swal.fire("Dihapus!", "Produk berhasil dihapus dari keranjang.", "success");
+        }
+        return;
       }
 
-      return;
+      await axios.put(`http://localhost:8000/api/cart/${id_cart}`, { quantity: newQty });
+      setCartItems((prev) =>
+        prev.map((i) => (i.id_cart === id_cart ? { ...i, quantity: newQty } : i))
+      );
+    } catch (error) {
+      Swal.fire("Error", "Gagal update keranjang: " + error.message, "error");
     }
-
-    await axios.put(`http://localhost:8000/api/cart/${id_cart}`, {
-      quantity: newQty,
-    });
-
-    setCartItems((prev) =>
-      prev.map((i) =>
-        i.id_cart === id_cart ? { ...i, quantity: newQty } : i
-      )
-    );
-  } catch (error) {
-    Swal.fire("Error", "Gagal update keranjang: " + error.message, "error");
-  }
-};
-
+  };
 
   const totalProduk = cartItems.reduce(
     (total, item) => total + item.product.harga_produk * item.quantity,
     0
   );
-
+  const ongkir = Math.floor(totalProduk * 0.1);
   const totalBayar = totalProduk + ongkir;
 
-  if (loading) return <div className="container py-5 text-center">Loading...</div>;
+  const handleCheckout = async () => {
+    if (!address) {
+      Swal.fire("Error", "Alamat pengiriman wajib diisi!", "error");
+      return;
+    }
 
+    Swal.fire({
+      title: "Memproses Pesanan...",
+      allowOutsideClick: false,
+      didOpen: () => Swal.showLoading(),
+    });
+
+    try {
+      const id_user = localStorage.getItem("id_user");
+      if (!id_user) return navigate("/login");
+
+      const payload = {
+        id_user,
+        address,
+        notes,
+        totalBayar,
+        items: cartItems.map((i) => ({
+          id_product: i.product.id_product,
+          quantity: i.quantity,
+        })),
+      };
+
+      await axios.post("http://localhost:8000/api/orders", payload);
+
+      Swal.fire({
+        title: "Pesanan Dibuat!",
+        text: "Pesanan Anda berhasil dibuat.",
+        icon: "success",
+      });
+
+      setCartItems([]);
+    } catch (error) {
+      Swal.fire("Error", "Gagal membuat pesanan: " + error.message, "error");
+    }
+  };
+
+  if (loading) return <div className="container py-5 text-center">Loading...</div>;
   if (cartItems.length === 0)
     return <div className="container py-5 text-center">Keranjang kosong.</div>;
 
@@ -145,7 +173,7 @@ const handleQuantityChange = async (id_cart, delta) => {
                 <span>Rp {totalProduk.toLocaleString()}</span>
               </div>
               <div className="mb-2 d-flex justify-content-between">
-                <span>Ongkir</span>
+                <span>Ongkir (10%)</span>
                 <span>Rp {ongkir.toLocaleString()}</span>
               </div>
               <div className="mb-3 d-flex justify-content-between fw-bold">
@@ -161,29 +189,6 @@ const handleQuantityChange = async (id_cart, delta) => {
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
                 />
-              </div>
-
-              <div className="mb-3">
-                <label className="form-label">Kode Voucher</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Masukkan kode"
-                  value={voucher}
-                  onChange={(e) => setVoucher(e.target.value)}
-                />
-              </div>
-
-              <div className="mb-3">
-                <label className="form-label">Pengiriman</label>
-                <select
-                  className="form-select"
-                  value={shippingMethod}
-                  onChange={(e) => setShippingMethod(e.target.value)}
-                >
-                  <option>Reguler</option>
-                  <option>Express</option>
-                </select>
               </div>
 
               <div className="mb-3">
@@ -208,7 +213,7 @@ const handleQuantityChange = async (id_cart, delta) => {
                 />
               </div>
 
-              <button className="btn btn-primary w-100">
+              <button className="btn btn-primary w-100" onClick={handleCheckout}>
                 Buat Pesanan
               </button>
             </div>

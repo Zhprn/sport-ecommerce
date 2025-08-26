@@ -20,16 +20,18 @@ const authRoutes = require('./Routes/AuthRoutes.js');
 const categoryRoutes = require('./Routes/CategoryRoutes.js');
 const productRoutes = require('./Routes/ProductRoutes.js');
 const cartRoutes = require('./Routes/CartRoutes.js');
+const orderRoutes = require('./Routes/OrderRoutes.js');
 
-app.use('/api', authRoutes);
+app.use('/api', authRoutes);  
 app.use('/api/category', categoryRoutes);
 app.use('/api/product', productRoutes);
 app.use('/api/cart', cartRoutes);
+app.use('/api/orders', orderRoutes);
 
-// const db = require('./models');
-// db.sequelize.sync({ alter: true })
-//   .then(() => console.log('✅ Database synced'))
-//   .catch(err => console.error('❌ Database sync error:', err));
+const db = require('./models');
+db.sequelize.sync({ alter: true })
+  .then(() => console.log('✅ Database synced'))
+  .catch(err => console.error('❌ Database sync error:', err));
 
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {

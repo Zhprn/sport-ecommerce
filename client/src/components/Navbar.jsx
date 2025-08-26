@@ -63,18 +63,8 @@ const ShopNavbar = () => {
         <Navbar.Brand href="/" className="fw-bold fs-4">SHOP.CO</Navbar.Brand>
 
         <Nav className="me-auto ms-4 align-items-center gap-3">
-          <Dropdown>
-            <Dropdown.Toggle variant="link" className="text-dark text-decoration-none p-0">
-              Shop
-            </Dropdown.Toggle>
-            <Dropdown.Menu>
-              <Dropdown.Item href="/clothes">Clothes</Dropdown.Item>
-              <Dropdown.Item href="/shoes">Shoes</Dropdown.Item>
-              <Dropdown.Item href="/accessories">Accessories</Dropdown.Item>
-            </Dropdown.Menu>
-          </Dropdown>
 
-          <Nav.Link href="#newArrifal" className="text-dark">New Arrivals</Nav.Link>
+          <Nav.Link href="#newArrival" className="text-dark">New Arrivals</Nav.Link>
           <Nav.Link href="/brand" className="text-dark">Brands</Nav.Link>
         </Nav>
 
@@ -100,6 +90,8 @@ const ShopNavbar = () => {
                 {username}
               </Dropdown.Toggle>
               <Dropdown.Menu>
+                <Dropdown.Item href="/orders">Orders</Dropdown.Item>
+                <Dropdown.Divider />
                 <Dropdown.Item onClick={handleLogout}>Logout</Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>

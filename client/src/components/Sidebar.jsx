@@ -1,41 +1,83 @@
 import React from "react";
-import { Home, LayoutDashboard, Settings, Box, PlusCircle } from "lucide-react";
+import { Home, LayoutDashboard, Settings, Box, PlusCircle, ClipboardList } from "lucide-react";
 
 const Sidebar = ({ setActivePage }) => {
   return (
-    <div className="sidebar bg-white shadow-sm" style={{ minHeight: "100vh", width: "250px" }}>
-      <div className="sidebar-header p-3 fw-bold fs-4 text-primary">
-        sneat
+    <div
+      className="sidebar bg-white shadow p-3"
+      style={{
+        minHeight: "100vh",
+        width: "250px",
+        display: "flex",
+        flexDirection: "column",
+        gap: "1rem",
+      }}
+    >
+      {/* Header */}
+      <div className="sidebar-header fw-bold fs-4 text-primary mb-3">
+        Sneat
       </div>
+
+      {/* Main Navigation */}
       <ul className="nav flex-column">
-        <li className="nav-item">
-          <button className="nav-link btn btn-link text-start w-100" onClick={() => setActivePage("dashboard")}>
-            <Home size={18} className="me-2" /> Dashboard
+        <li className="nav-item mb-1">
+          <button
+            className="nav-link btn btn-light text-start w-100 d-flex align-items-center gap-2"
+            onClick={() => setActivePage("dashboard")}
+            style={{ borderRadius: "8px" }}
+          >
+            <Home size={18} /> Dashboard
           </button>
         </li>
-        <li className="nav-item">
-          <button className="nav-link btn btn-link text-start w-100" onClick={() => setActivePage("layouts")}>
-            <LayoutDashboard size={18} className="me-2" /> Layouts
+        <li className="nav-item mb-1">
+          <button
+            className="nav-link btn btn-light text-start w-100 d-flex align-items-center gap-2"
+            onClick={() => setActivePage("layouts")}
+            style={{ borderRadius: "8px" }}
+          >
+            <LayoutDashboard size={18} /> Layouts
           </button>
         </li>
 
-        <li className="nav-item mt-2 small text-muted px-3">MANAGE</li>
-        <li className="nav-item">
-          <button className="nav-link btn btn-link text-start w-100" onClick={() => setActivePage("product")}>
-            <Settings size={18} className="me-2" /> Product
-          </button>
-        </li>
-        <li className="nav-item ps-4">
+        {/* Manage Product */}
+        <li className="nav-item mt-3 small text-muted px-3">MANAGE PRODUCT</li>
+        <li className="nav-item mb-1">
           <button
-            className="nav-link btn btn-link text-start w-100 text-success"
-            onClick={() => setActivePage("addProduct")}
+            className="nav-link btn btn-light text-start w-100 d-flex align-items-center gap-2"
+            onClick={() => setActivePage("product")}
+            style={{ borderRadius: "8px" }}
           >
-            <PlusCircle size={16} className="me-2" /> Add Product
+            <Settings size={18} /> Product
           </button>
         </li>
-        <li className="nav-item">
-          <button className="nav-link btn btn-link text-start w-100" onClick={() => setActivePage("category")}>
-            <Box size={18} className="me-2" /> Category
+        <li className="nav-item ps-4 mb-1">
+          <button
+            className="nav-link btn btn-light text-start w-100 text-success d-flex align-items-center gap-2"
+            onClick={() => setActivePage("addProduct")}
+            style={{ borderRadius: "8px" }}
+          >
+            <PlusCircle size={16} /> Add Product
+          </button>
+        </li>
+        <li className="nav-item mb-1">
+          <button
+            className="nav-link btn btn-light text-start w-100 d-flex align-items-center gap-2"
+            onClick={() => setActivePage("category")}
+            style={{ borderRadius: "8px" }}
+          >
+            <Box size={18} /> Category
+          </button>
+        </li>
+
+        {/* Orders */}
+        <li className="nav-item mt-3 small text-muted px-3">ORDERS</li>
+        <li className="nav-item mb-1">
+          <button
+            className="nav-link btn btn-light text-start w-100 d-flex align-items-center gap-2"
+            onClick={() => setActivePage("order")}
+            style={{ borderRadius: "8px" }}
+          >
+            <ClipboardList size={18} /> Orders
           </button>
         </li>
       </ul>
